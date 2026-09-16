@@ -6,6 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,13 +23,32 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Cache Gradle
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        id: build_debug
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug --stacktrace 2>&1 | tee /tmp/gradle_build.log
+
+      - name: Report build errors to PR
+        if: failure() && github.event_name == 'pull_request'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '## Build failed with the following errors'
+            echo '```'
+            tail -n 250 /tmp/gradle_build.log
+            echo '```'
+          } > /tmp/err_report.txt
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/err_report.txt || true
 
       - name: Build release APK (unsigned)
+        shell: bash
         run: ./gradlew assembleRelease --stacktrace
 
       - name: Upload debug APK
