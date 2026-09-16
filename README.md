@@ -1,9 +1,10 @@
 # Browser2 — ultra-light Android browser (Kotlin + WebView)
 
 දිදුලන අවශ්‍යතා සහිත අති-සැහැල්ලු Android browser එකක්. **Kotlin + Android WebView** මත ගොඩනඟා ඇත —
-WebView යනු Android phone එකේම තියෙන system engine එක නිසා APK එක කුඩායි (≈ 300–500 KB **minus** the
-system engine), RAM/battery වියදම අඩුයි, ඒ වගේම YouTube/WebM/WebRTC වගේ modern sites 100% වැඩ කරයි.
-V8/Blink දෙවන පාරක් bundle කරන "full-power browser" එකකට වඩා බොහොම low-end phone වලට සුදුසුයි.
+WebView යනු Android phone එකේම තියෙන system engine එක නිසා, browser engine එකක් (V8/Blink ~100MB+)
+APK එකට bundle කරන්න ඕනේ නැහැ. ඒ නිසා APK එක **~2.5 MB** විතරයි, RAM/battery වියදම අඩුයි,
+ඒ වගේම YouTube/WebM/WebRTC වගේ modern sites 100% වැඩ කරයි. Engine එකක් දෙවන පාරක් bundle කරන
+"full-power browser" එකකට වඩා බොහොම low-end phone වලට සුදුසුයි.
 
 ## What's included
 
@@ -21,6 +22,14 @@ V8/Blink දෙවන පාරක් bundle කරන "full-power browser" එ�
 
 > ⚠️ Note: YouTube **video** background playback is blocked by Google for third-party browsers; YouTube
 > **Music/audio** and most other media services work in the background and show controls in the notification.
+> Web videos (MP4/WebM) play in the background too.
+
+## Get the APK right now
+
+This repo builds automatically on GitHub. **Your APK is already built** — open the
+[**Actions** tab](https://github.com/Sudantha123/Browser2/actions) → the latest green **"Build APK"** run →
+scroll to **Artifacts** → download **`browser2-debug`** (zip). Unzip, copy the `app-debug.apk` to your phone,
+allow "Install unknown apps" and install.
 
 ## Build it from GitHub
 
