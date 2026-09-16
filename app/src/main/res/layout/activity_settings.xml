@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_normal">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/tabbar">
+
+        <ImageButton
+            android:id="@+id/btn_settings_back"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="start|center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/back_button" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/settings"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/SectionHeader" android:text="@string/homepage" />
+            <EditText
+                android:id="@+id/home_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri"
+                android:hint="@string/address_hint"
+                android:singleLine="true"
+                android:padding="10dp"
+                android:textSize="14sp" />
+
+            <TextView style="@style/SectionHeader" android:text="@string/search_engine" />
+            <RadioGroup
+                android:id="@+id/engine_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RadioButton android:id="@+id/engine_google" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Google" android:checked="true" />
+                <RadioButton android:id="@+id/engine_ddg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="DuckDuckGo" />
+                <RadioButton android:id="@+id/engine_bing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bing" />
+            </RadioGroup>
+
+            <TextView style="@style/SectionHeader" android:text="@string/browsing" />
+            <CheckBox android:id="@+id/box_js" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/enable_js" android:checked="true" />
+            <CheckBox android:id="@+id/box_desktop" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/desktop_mode" />
+            <CheckBox android:id="@+id/box_cache" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/enable_cache" android:checked="true" android:enabled="false" />
+            <CheckBox android:id="@+id/box_third_party" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/enable_third_party_cookies" android:checked="true" android:enabled="false" />
+
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/save" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

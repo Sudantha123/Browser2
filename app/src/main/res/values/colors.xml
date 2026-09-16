@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_normal">#F6F6F8</color>
+    <color name="tabbar">#F1F1F4</color>
+    <color name="text_primary">#1C1C22</color>
+    <color name="selectable_ripple">#22000000</color>
+    <color name="progress">#E53935</color>
+    <color name="accent">#E53935</color>
+</resources>
