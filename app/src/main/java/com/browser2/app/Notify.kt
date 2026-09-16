@@ -51,7 +51,7 @@ object Notify {
     /** Returns true if Android 13+ still needs the runtime POST_NOTIFICATIONS permission. */
     fun needsPermissionRequest(ctx: Context): Boolean {
         if (Build.VERSION.SDK_INT < 33) return false
-        return ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED
+        val granted = ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        return !granted
     }
 }

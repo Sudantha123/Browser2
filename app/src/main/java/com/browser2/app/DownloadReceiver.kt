@@ -80,6 +80,7 @@ class DownloadReceiver : BroadcastReceiver() {
             when (status) {
                 DownloadManager.STATUS_SUCCESSFUL -> notifySuccess(context, id, localTitle, uriStr)
                 DownloadManager.STATUS_FAILED -> notifyFailed(context, localTitle, reason)
+                else -> Unit
             }
             } else cursor?.close()
         }

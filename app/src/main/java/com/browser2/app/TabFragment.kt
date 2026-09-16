@@ -44,7 +44,7 @@ class TabFragment(
         fun onNavigationChanged(fragment: TabFragment)
         fun onMediaDetected(fragment: TabFragment, mav: MavInfo)
         fun onFullScreenRequested(fragment: TabFragment, view: View?)
-        fun onCreateWindow(fragment: TabFragment, view: WebView, resultMsg: android.os.Message): Boolean
+        fun onPopupRequest(fragment: TabFragment, view: WebView, resultMsg: android.os.Message)
     }
 
     var webView: WebView? = null
@@ -52,6 +52,8 @@ class TabFragment(
     private var fullscreenView: View? = null
     private var customViewCallback: WebChromeClient.CustomViewCallback? = null
     private var lastTitle = ""
+
+    val isIncognito get() = tab.incognito
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, state: Bundle?): View {
         val frame = FrameLayout(requireContext())
@@ -61,24 +63,34 @@ class TabFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (webView == null) createWebView()
+        ensureWebView()
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun createWebView() {
-        val wv = providedWebView ?: WebView(requireContext()).apply {
-            layoutParams = FrameLayout.LayoutParams(
+    private fun ensureWebView() {
+        if (webView != null) return
+        val wv = providedWebView ?: WebView(requireContext()).also {
+            it.layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
-            setBackgroundColor(if (tab.incognito) 0xFF14141A.toInt() else 0xFFFFFFFF.toInt())
-            isVerticalScrollBarEnabled = false
-            isHorizontalScrollBarEnabled = false
+            it.setBackgroundColor(if (tab.incognito) 0xFF14141A.toInt() else 0xFFFFFFFF.toInt())
+            it.isVerticalScrollBarEnabled = false
+            it.isHorizontalScrollBarEnabled = false
         }
+        configure(wv)
         webView = wv
-        val parent = wv.parent
-        if (parent == null) (view as FrameLayout).addView(wv)
+        if (wv.parent == null) {
+            val root = view
+            if (root != null && root is FrameLayout) root.addView(wv)
+        }
+        if (providedWebView == null) {
+            if (tab.url.isNotBlank()) wv.loadUrl(tab.url) else wv.loadUrl("about:blank")
+        }
+    }
 
+    /** We keep one config path so popup-provided WebViews behave identically. */
+    @SuppressLint("SetJavaScriptEnabled")
+    fun configure(wv: WebView) {
         val ws = wv.settings
         ws.javaScriptEnabled = settings.enableJavaScript
         ws.domStorageEnabled = settings.enableDomStorage
@@ -143,17 +155,13 @@ class TabFragment(
                 tab.canGoForward = view.canGoForward()
                 host.onNavigationChanged(this@TabFragment)
             }
-
-            override fun onCreateWindow(
-                view: WebView,
-                isDialog: Boolean,
-                isUserGesture: Boolean,
-                resultMsg: android.os.Message
-            ): Boolean {
-                // Let the host open popup windows (target=_blank) as fresh tabs.
-                return host.onCreateWindow(this@TabFragment, view, resultMsg)
-            }
         }
+
+        wv.setDownloadListener(DownloadListener { url, _, contentDisposition, mimeType, _ ->
+            handleDownload(url, contentDisposition ?: "", mimeType ?: "")
+        })
+
+        BrowserJsBridge.attach(wv)
 
         wv.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView, newProgress: Int) {
@@ -181,18 +189,16 @@ class TabFragment(
                 customViewCallback = null
                 host.onFullScreenRequested(this@TabFragment, null)
             }
-        }
 
-        wv.setDownloadListener(DownloadListener { url, _, contentDisposition, mimeType, _ ->
-            handleDownload(url, contentDisposition ?: "", mimeType ?: "")
-        })
-
-        BrowserJsBridge.attach(wv)
-
-        // A popup WebView handed to us by the engine is already navigating on its own,
-        // so only load an initial URL for WebViews we created ourselves.
-        if (providedWebView == null) {
-            if (tab.url.isNotBlank()) wv.loadUrl(tab.url) else wv.loadUrl("about:blank")
+            override fun onCreateWindow(
+                view: WebView,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: android.os.Message
+            ): Boolean {
+                host.onPopupRequest(this@TabFragment, view, resultMsg)
+                return true
+            }
         }
     }
 

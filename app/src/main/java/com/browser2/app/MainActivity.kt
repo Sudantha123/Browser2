@@ -79,7 +79,9 @@ class MainActivity : AppCompatActivity(), TabFragment.Host {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQ_NOTIFICATIONS)
         }
 
-        BrowserJsBridge.listener = { mav -> onMediaDetected(currentFragment, mav) }
+        BrowserJsBridge.listener = { mav ->
+            currentFragment?.let { onMediaDetected(it, mav) }
+        }
 
         incognito = Prefs.incognitoOn(this)
 
@@ -452,24 +454,16 @@ class MainActivity : AppCompatActivity(), TabFragment.Host {
         refreshAll()
     }
 
-    override fun onNewTabRequested(fragment: TabFragment, url: String) {
-        val tab = Tab.new(incognito).apply { this.url = url }
-        activeList().add(tab)
-        showTab(tab)
-    }
-
-    override fun onCreateWindow(fragment: TabFragment, view: WebView, resultMsg: android.os.Message): Boolean {
-        // Popup / target=_blank: hand the engine a fresh WebView and show it as a new tab.
+    override fun onPopupRequest(fragment: TabFragment, view: WebView, resultMsg: android.os.Message) {
+        // Popup / target=_blank: give the engine a fresh WebView and show it as a new tab.
         val newWebView = WebView(this)
+        runCatching {
+            (resultMsg.obj as? WebView.WebViewTransport)?.webView = newWebView
+            resultMsg.sendToTarget()
+        }
         val tab = Tab.new(incognito)
         activeList().add(tab)
-        try {
-            resultMsg.obj = WebView.WebViewTransport().apply { webView = newWebView }
-            resultMsg.sendToTarget()
-        } catch (_: Exception) {
-        }
         showTabWithProvidedView(tab, newWebView)
-        return true
     }
 
     /** Like [showTab] but reuses an existing WebView (used for popup windows). */
@@ -560,8 +554,6 @@ class MainActivity : AppCompatActivity(), TabFragment.Host {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
     }
-
-    override fun settingsSnapshot(): Settings = collectSettings()
 
     // ------------------------------------------------------------ lifecycle ----
 

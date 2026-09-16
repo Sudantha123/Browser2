@@ -54,7 +54,10 @@ object Session {
     var activeTab: Tab? = null
 
     private var seq = 0
-    fun nextTabId(): Long = ++seq.toLong()
+    fun nextTabId(): Long {
+        seq += 1
+        return seq.toLong()
+    }
 
     /** Clears absolutely everything in memory, used when leaving incognito mode. */
     fun clear() {

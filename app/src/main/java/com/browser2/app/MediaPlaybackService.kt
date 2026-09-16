@@ -12,9 +12,9 @@ import android.os.Looper
 import android.view.KeyEvent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.media.MediaMetadataCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 
@@ -252,16 +252,16 @@ class MediaPlaybackService : Service() {
             .setContentIntent(contentIntent)
             .addAction(
                 R.drawable.ic_prev, getString(R.string.previous),
-                MediaButtonReceiver.buildMediaButtonPendingIntent(this, KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+                MediaButtonReceiver.buildMediaButtonPendingIntent(this, KeyEvent.KEYCODE_MEDIA_PREVIOUS.toLong())
             )
             .addAction(
                 if (playing) R.drawable.ic_pause else R.drawable.ic_play,
                 getString(if (playing) R.string.pause else R.string.play),
-                MediaButtonReceiver.buildMediaButtonPendingIntent(this, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+                MediaButtonReceiver.buildMediaButtonPendingIntent(this, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE.toLong())
             )
             .addAction(
                 R.drawable.ic_next, getString(R.string.next),
-                MediaButtonReceiver.buildMediaButtonPendingIntent(this, KeyEvent.KEYCODE_MEDIA_NEXT)
+                MediaButtonReceiver.buildMediaButtonPendingIntent(this, KeyEvent.KEYCODE_MEDIA_NEXT.toLong())
             )
 
         val art = meta?.getBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART)
